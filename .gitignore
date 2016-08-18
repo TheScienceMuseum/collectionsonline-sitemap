@@ -2,3 +2,4 @@ node_modules
 coverage
 settings.json
 dist/*.zip
+tmp
