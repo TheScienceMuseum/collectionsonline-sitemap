@@ -15,13 +15,15 @@
     "async": "^2.0.1",
     "data2xml": "^1.2.5",
     "elasticsearch": "^11.0.1",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "s3": "^4.4.0"
   },
   "devDependencies": {
     "faker": "^3.1.0",
     "getversion": "^0.1.1",
     "istanbul": "^0.4.4",
     "semistandard": "^8.0.0",
+    "sinon": "^1.17.5",
     "tape": "^4.6.0",
     "xml2js": "^0.4.17"
   },
