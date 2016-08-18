@@ -7,16 +7,14 @@ const createSitemap = require('./lib/create-sitemap');
 const createSitemapIndex = require('./lib/create-sitemap-index');
 const uploadFiles = require('./lib/upload-files');
 
-const SITEMAPS_BASE_PATH = Path.join(__dirname, 'tmp');
-
 module.exports = (elastic, s3, settings) => {
-  const sitemapsPath = Path.join(SITEMAPS_BASE_PATH, Date.now().toString());
+  const sitemapDir = Path.join(settings.tmpDir, 'sitemap' + Date.now().toString());
 
   return (event, context, cb) => {
     Async.waterfall([
 
       // Create tmp dir for storing the created sitemaps
-      (cb) => mkdirp(sitemapsPath, (err) => cb(err)),
+      (cb) => mkdirp(sitemapDir, (err) => cb(err)),
 
       // Create each sitemap
       (cb) => {
@@ -33,7 +31,7 @@ module.exports = (elastic, s3, settings) => {
           // Transform a batch of sitemap entries into a sitemap.xml
           onBatch: (entries, cb) => {
             const filename = `sitemap-${sitemaps.length}.xml`;
-            const filePath = Path.join(sitemapsPath, filename);
+            const filePath = Path.join(sitemapDir, filename);
 
             createSitemap(entries, filePath, (err) => {
               if (err) return cb(err);
@@ -47,7 +45,7 @@ module.exports = (elastic, s3, settings) => {
 
       // Create sitemap index file
       (sitemaps, cb) => {
-        const filePath = Path.join(sitemapsPath, 'sitemap.xml');
+        const filePath = Path.join(sitemapDir, 'sitemap.xml');
 
         createSitemapIndex(sitemaps, settings.sitemapUrl, filePath, (err) => {
           if (err) return cb(err);
@@ -57,7 +55,7 @@ module.exports = (elastic, s3, settings) => {
 
       // Upload to s3
       (sitemaps, cb) => {
-        uploadFiles(s3, sitemaps, sitemapsPath, settings.s3.bucket, (err) => cb(err, sitemaps));
+        uploadFiles(s3, sitemaps, sitemapDir, settings.s3.bucket, (err) => cb(err, sitemaps));
       }
 
     ], (err, sitemaps) => {
