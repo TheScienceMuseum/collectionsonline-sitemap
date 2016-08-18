@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap.svg)](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap) [![dependencies Status](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap/status.svg)](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap)
+[![Build Status](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap.svg)](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap) [![dependencies Status](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap/status.svg)](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap) [![Coverage Status](https://img.shields.io/codecov/c/github/TheScienceMuseum/collectionsonline-sitemap.svg?maxAge=2592000)](https://codecov.io/gh/TheScienceMuseum/collectionsonline-sitemap)
 
 # collectionsonline-sitemap
 
