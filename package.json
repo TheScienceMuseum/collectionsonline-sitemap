@@ -4,8 +4,9 @@
   "description": "An AWS lambda for generating a sitemap.xml for the collections online website",
   "main": "index.js",
   "scripts": {
-    "build": "VERSION=`getversion` && zip -q -r \"dist/sitemap-v$VERSION.zip\" *",
-    "clean": "rm dist/*.zip",
+    "build": "npm run clean && npm run build:zip",
+    "build:zip": "VERSION=`getversion` && zip -q -r \"dist/sitemap-v$VERSION.zip\" * -x dist/\\* coverage/\\*",
+    "clean": "rm -rf dist/*",
     "test": "semistandard && istanbul cover tape test.js"
   },
   "author": "Science Museum Group",
