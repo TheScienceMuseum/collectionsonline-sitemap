@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && npm run build:zip",
-    "build:zip": "VERSION=`getversion` && zip -q -r \"dist/sitemap-v$VERSION.zip\" * -x dist/\\* coverage/\\*",
+    "build:zip": "VERSION=`getversion` && zip -q -r \"dist/sitemap-v$VERSION.zip\" * -x dist/\\* coverage/\\* tmp/\\*",
     "clean": "rm -rf dist/*",
     "test": "semistandard && istanbul cover tape 'test/*.test.js'"
   },
