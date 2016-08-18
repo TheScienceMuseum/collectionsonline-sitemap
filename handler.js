@@ -51,7 +51,7 @@ module.exports = (elastic, s3, settings) => {
 
         createSitemapIndex(sitemaps, settings.sitemapUrl, filePath, (err) => {
           if (err) return cb(err);
-          cb(null, sitemaps.concat('sitemap.xml'));
+          cb(null, ['sitemap.xml'].concat(sitemaps));
         });
       },
 
