@@ -7,7 +7,7 @@
     "build": "npm run clean && npm run build:zip",
     "build:zip": "VERSION=`getversion` && zip -q -r \"dist/sitemap-v$VERSION.zip\" * -x dist/\\* coverage/\\*",
     "clean": "rm -rf dist/*",
-    "test": "semistandard && istanbul cover tape test.js"
+    "test": "semistandard && istanbul cover tape 'test/*.test.js'"
   },
   "author": "Science Museum Group",
   "license": "MIT",
@@ -18,10 +18,12 @@
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
+    "faker": "^3.1.0",
     "getversion": "^0.1.1",
     "istanbul": "^0.4.4",
     "semistandard": "^8.0.0",
-    "tape": "^4.6.0"
+    "tape": "^4.6.0",
+    "xml2js": "^0.4.17"
   },
   "repository": {
     "type": "git",
