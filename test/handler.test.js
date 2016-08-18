@@ -7,15 +7,36 @@ const noop = () => null;
 test('Should generate and upload sitemap.xml', (t) => {
   t.plan(4);
 
+  // Elastic index will have 3 documents in it
+  // Page size is 1
+  // Max URLs per sitemap is 2
+  const testSettings = {
+    siteUrl: 'http://localhost',
+    sitemapUrl: 'http://localhost',
+    pageSize: 1, // Page size 1 so scroll is called for the second & third page
+    maxSitemapUrls: 2, // To split 3 documents between 2 sitemaps
+    elasticsearch: {
+      apiVersion: 2.3,
+      host: 'http://localhost'
+    },
+    s3: {
+      accessKeyId: 'TEST',
+      secretAccessKey: 'TEST',
+      bucket: 'TEST'
+    }
+  };
+
   const elastic = { search: noop, scroll: noop };
   const mockElastic = Sinon.mock(elastic);
 
   const result = () => ({ hits: { total: 3, hits: [fakeHit()] } });
 
+  // First result on initial call
   mockElastic.expects('search')
     .exactly(1)
     .callsArgWithAsync(1, null, result());
 
+  // Second and third result on second and third call
   mockElastic.expects('scroll')
     .exactly(2)
     .onFirstCall().callsArgWithAsync(1, null, result())
@@ -32,25 +53,10 @@ test('Should generate and upload sitemap.xml', (t) => {
   });
 
   mockS3.expects('uploadFile')
-    .exactly(2)  // 2 for index and sitemap
+    .exactly(3)  // Expecting 3 files ot upload: index, sitemap 1 and sitemap 2
     .onFirstCall().returns(emitter())
-    .onSecondCall().returns(emitter());
-
-  const testSettings = {
-    siteUrl: 'http://localhost',
-    sitemapUrl: 'http://localhost',
-    maxSitemapUrls: 50000,
-    pageSize: 1, // Page size 1 so scroll is called for the second & third page
-    elasticsearch: {
-      apiVersion: 2.3,
-      host: 'http://localhost'
-    },
-    s3: {
-      accessKeyId: 'TEST',
-      secretAccessKey: 'TEST',
-      bucket: 'TEST'
-    }
-  };
+    .onSecondCall().returns(emitter())
+    .onThirdCall().returns(emitter());
 
   const handler = createHandler(elastic, s3, testSettings);
 
@@ -59,7 +65,7 @@ test('Should generate and upload sitemap.xml', (t) => {
     t.ifError(err, 'Handler completed successfully');
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.doesNotThrow(() => mockS3.verify(), 's3 mock verified');
-    t.equal(sitemapUrls.length, 2, 'Correct number of sitemaps created');
+    t.equal(sitemapUrls.length, 3, 'Correct number of sitemaps created');
     t.end();
   });
 });
