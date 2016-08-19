@@ -3,9 +3,15 @@
   "sitemapUrl": "http://localhost:8000",
   "maxSitemapUrls": 50000,
   "pageSize": 10000,
+  "tmpDir": "/tmp",
   "elasticsearch": {
     "apiVersion": "2.3",
     "host": "",
-    "log": "trace"
+    "log": "error"
+  },
+  "s3": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "bucket": ""
   }
 }
