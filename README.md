@@ -25,7 +25,7 @@ The maximum number of URLs to include in each sitemap file (50,000 is the spec m
 The size of the pages retrieved from elasticsearch.
 
 ### `tmpDir`
-Temporary directory where the sitemap files are stored. For running on AWS this should be set to `/tmp` but recommended to be `.` for local dev.
+Temporary directory where the sitemap files are stored. For running on AWS this should be set to `/tmp` but recommended to be `tmp` for local dev.
 
 ### `elasticsearch`
 Connection details for the elasticsearch index to use.

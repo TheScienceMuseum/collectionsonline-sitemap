@@ -8,7 +8,7 @@ const createSitemapIndex = require('./lib/create-sitemap-index');
 const uploadFiles = require('./lib/upload-files');
 
 module.exports = (elastic, s3, settings) => {
-  const sitemapDir = Path.join(settings.tmpDir, 'sitemap' + Date.now().toString());
+  const sitemapDir = Path.join(settings.tmpDir || 'tmp', 'sitemap' + Date.now().toString());
 
   return (event, context, cb) => {
     Async.waterfall([
