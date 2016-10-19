@@ -1,6 +1,6 @@
 {
   "name": "collectionsonline-sitemap",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An AWS lambda for generating a sitemap.xml for the collections online website",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,8 @@
     "elasticsearch": "^11.0.1",
     "getversion": "^0.1.1",
     "mkdirp": "^0.5.1",
-    "s3": "https://github.com/andrewrk/node-s3-client#0ed018699843a2d3cc1cb37399ead1f76a72576d"
+    "s3": "https://github.com/andrewrk/node-s3-client#0ed018699843a2d3cc1cb37399ead1f76a72576d",
+    "slug": "^0.9.1"
   },
   "devDependencies": {
     "faker": "^3.1.0",
