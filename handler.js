@@ -6,6 +6,7 @@ const hitToSitemapEntry = require('./lib/hit-to-sitemap-entry');
 const createSitemap = require('./lib/create-sitemap');
 const createSitemapIndex = require('./lib/create-sitemap-index');
 const uploadFiles = require('./lib/upload-files');
+const addKeySerps = require('./lib/add-key-serps');
 
 module.exports = (elastic, s3, settings) => {
   const sitemapDir = Path.join(settings.tmpDir || 'tmp', 'sitemap' + Date.now().toString());
@@ -16,10 +17,26 @@ module.exports = (elastic, s3, settings) => {
       // Create tmp dir for storing the created sitemaps
       (cb) => mkdirp(sitemapDir, (err) => cb(err)),
 
-      // Create each sitemap
+      // Add key SERP pages to sitemap
       (cb) => {
         const sitemaps = [];
 
+        addKeySerps(elastic, settings, sitemaps, cb);
+      },
+
+      (sitemaps, cb) => {
+        const filename = `sitemap-${0}.xml`;
+        const filePath = Path.join(sitemapDir, filename);
+
+        createSitemap(sitemaps, filePath, (err) => {
+          if (err) return cb(err);
+          console.log(`${filename} created`);
+          cb(null, [filename]);
+        });
+      },
+
+      // Create each sitemap
+      (sitemaps, cb) => {
         scrollIndex(elastic, {
           batchSize: settings.maxSitemapUrls,
           pageSize: settings.pageSize,

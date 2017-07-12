@@ -16,7 +16,7 @@ test('Should generate and upload sitemap.xml', (t) => {
     pageSize: 1, // Page size 1 so scroll is called for the second & third page
     maxSitemapUrls: 2, // To split 3 documents between 2 sitemaps
     elasticsearch: {
-      apiVersion: 2.3,
+      apiVersion: 5.4,
       host: 'http://localhost'
     },
     s3: {
@@ -31,7 +31,23 @@ test('Should generate and upload sitemap.xml', (t) => {
 
   const result = () => ({ hits: { total: 3, hits: [fakeHit()] } });
 
+  const catResult = () => ({aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}});
+  const locResult = () => ({aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}});
+  const locCatResult = () => ({aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}});
+
   // First result on initial call
+  mockElastic.expects('search')
+    .exactly(1)
+    .callsArgWithAsync(1, null, catResult());
+
+  mockElastic.expects('search')
+    .exactly(1)
+    .callsArgWithAsync(1, null, locResult());
+
+  mockElastic.expects('search')
+    .exactly(4)
+    .callsArgWithAsync(1, null, locCatResult());
+
   mockElastic.expects('search')
     .exactly(1)
     .callsArgWithAsync(1, null, result());
@@ -53,10 +69,11 @@ test('Should generate and upload sitemap.xml', (t) => {
   });
 
   mockS3.expects('uploadFile')
-    .exactly(3)  // Expecting 3 files ot upload: index, sitemap 1 and sitemap 2
+    .exactly(4)  // Expecting 4 files ot upload: index, sitemap 1 and sitemap 2
     .onFirstCall().returns(emitter())
     .onSecondCall().returns(emitter())
-    .onThirdCall().returns(emitter());
+    .onThirdCall().returns(emitter())
+    .onCall(3).returns(emitter());
 
   const handler = createHandler(elastic, s3, testSettings);
 
@@ -65,7 +82,7 @@ test('Should generate and upload sitemap.xml', (t) => {
     t.ifError(err, 'Handler completed successfully');
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.doesNotThrow(() => mockS3.verify(), 's3 mock verified');
-    t.equal(sitemapUrls.length, 3, 'Correct number of sitemaps created');
+    t.equal(sitemapUrls.length, 4, 'Correct number of sitemaps created');
     t.end();
   });
 });
