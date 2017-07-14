@@ -44,8 +44,8 @@ test('Should get key serp pages', (t) => {
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.ok(data.every(el => el.loc === el.loc.toLowerCase()), 'URLs are all lowercase');
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/surgery'), 'URLs are created correctly');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science%20museum/categories/robots'), 'URLs are created correctly');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science%20museum'), 'URLs are created correctly');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum/categories/robots'), 'URLs are created correctly');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum'), 'URLs are created correctly');
     t.end();
   });
 });
