@@ -14,7 +14,7 @@
   "dependencies": {
     "async": "^2.0.1",
     "data2xml": "^1.2.5",
-    "elasticsearch": "^11.0.1",
+    "elasticsearch": "^13.2.0",
     "getversion": "^0.1.1",
     "mkdirp": "^0.5.1",
     "s3": "https://github.com/andrewrk/node-s3-client#0ed018699843a2d3cc1cb37399ead1f76a72576d",
