@@ -6,6 +6,6 @@ module.exports = () => {
   return {
     _id: id,
     _type: type,
-    _source: { admin: { modified: Faker.date.past().getTime() } }
+    _source: { '@admin': { processed: Faker.date.past().getTime() } }
   };
 };

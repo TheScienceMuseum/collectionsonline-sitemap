@@ -17,7 +17,7 @@ test('Should generate and upload sitemap.xml', (t) => {
     maxSitemapUrls: 2, // To split 3 documents between 2 sitemaps
     elasticsearch: {
       apiVersion: 5.4,
-      host: 'http://localhost'
+      node: 'http://localhost'
     },
     s3: {
       accessKeyId: 'TEST',
@@ -29,11 +29,10 @@ test('Should generate and upload sitemap.xml', (t) => {
   const elastic = { search: noop, scroll: noop };
   const mockElastic = Sinon.mock(elastic);
 
-  const result = () => ({ hits: { total: 3, hits: [fakeHit()] } });
-
-  const catResult = () => ({aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}});
-  const locResult = () => ({aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}});
-  const locCatResult = () => ({aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}});
+  const result = () => ({body: {hits: {total: 3, hits: [fakeHit()]}}});
+  const catResult = () => ({body: {aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}}});
+  const locResult = () => ({body: {aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}}});
+  const locCatResult = () => ({body: {aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}}});
 
   // First result on initial call
   mockElastic.expects('search')

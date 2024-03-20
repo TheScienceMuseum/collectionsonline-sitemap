@@ -23,9 +23,9 @@ test('Should get key serp pages', (t) => {
   const elastic = { search: noop };
   const mockElastic = Sinon.mock(elastic);
 
-  const catResult = () => ({aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}});
-  const locResult = () => ({aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}});
-  const locCatResult = () => ({aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}});
+  const catResult = () => ({body: {aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}}});
+  const locResult = () => ({body: {aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}}});
+  const locCatResult = () => ({body: {aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}}});
 
   mockElastic.expects('search')
     .exactly(1)
