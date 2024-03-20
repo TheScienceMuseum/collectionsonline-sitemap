@@ -40,7 +40,7 @@ module.exports = (elastic, s3, settings) => {
         scrollIndex(elastic, {
           batchSize: settings.maxSitemapUrls,
           pageSize: settings.pageSize,
-          fields: ['@admin.processed', 'summary.title'],
+          fields: ['@admin.processed', '@datatype.base', 'summary.title'],
 
           // Transform a hit into a sitemap entry
           onHit: (hit) => hitToSitemapEntry(hit, settings.siteUrl),

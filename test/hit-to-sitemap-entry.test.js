@@ -10,12 +10,14 @@ test('Should convert hit document to sitemap entry with slug', (t) => {
 
   const hit = {
     _id: id,
-    _type: type,
     _source: {
       '@admin': {
         processed: processed
       },
-      summary_title: 'Charles Babbage'
+      '@datatype': {
+        base: type
+      },
+      summary: { title: 'Charles Babbage' }
     }
   };
 
@@ -44,11 +46,14 @@ test('Should convert hit document to sitemap entry without slug', (t) => {
 
   const hit = {
     _id: id,
-    _type: type,
     _source: {
       '@admin': {
         processed: processed
-      }
+      },
+      '@datatype': {
+        base: type
+      },
+      summary: { title: 'Secret Agent' }
     }
   };
 
