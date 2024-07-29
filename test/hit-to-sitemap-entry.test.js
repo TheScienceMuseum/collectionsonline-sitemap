@@ -62,7 +62,7 @@ test('Should convert hit document to sitemap entry without slug', (t) => {
   const entry = hitToSitemapEntry(hit, url);
 
   t.ok(entry.loc, 'Entry has location key');
-  t.equal(entry.loc, `${url}/people/smg-people-12346`, 'Entry has expected location value');
+  t.equal(entry.loc, `${url}/people/smg-people-12346/secret-agent`, 'Entry has expected location value');
 
   t.end();
 });
