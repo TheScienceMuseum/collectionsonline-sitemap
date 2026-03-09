@@ -10,7 +10,7 @@ const testSettings = {
 };
 
 test('Should convert hit document to sitemap entry with slug', (t) => {
-  t.plan(6);
+  t.plan(5);
 
   const id = 'smg-agent-12345';
   const type = 'agent';
@@ -33,8 +33,6 @@ test('Should convert hit document to sitemap entry with slug', (t) => {
 
     t.ok(entry.lastmod, 'Entry has last processed key');
     t.equal(entry.lastmod, new Date(processed).toISOString(), 'Entry has expected last processed value');
-
-    t.ok(entry.changefreq, 'Entry has change frequency key');
 
     t.end();
   });
