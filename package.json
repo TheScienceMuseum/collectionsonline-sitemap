@@ -20,13 +20,13 @@
     "data2xml": "^1.2.5",
     "getversion": "^0.1.1",
     "mkdirp": "^0.5.1",
-    "s3": "https://github.com/andrewrk/node-s3-client#0ed018699843a2d3cc1cb37399ead1f76a72576d",
+    "@aws-sdk/client-s3": "^3.0.0",
     "slug": "^0.9.1"
   },
   "devDependencies": {
     "faker": "^3.1.0",
     "istanbul": "^0.4.4",
-    "semistandard": "^8.0.0",
+    "semistandard": "^17.0.0",
     "sinon": "^1.17.5",
     "tape": "^4.6.0",
     "xml2js": "^0.5.0"
