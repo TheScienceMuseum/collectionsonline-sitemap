@@ -10,7 +10,6 @@
     "log": "error"
   },
   "s3": {
-    "region": "eu-west-1",
     "accessKeyId": "",
     "secretAccessKey": "",
     "bucket": ""

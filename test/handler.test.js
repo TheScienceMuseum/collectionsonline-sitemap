@@ -57,12 +57,22 @@ test('Should generate and upload sitemap.xml', (t) => {
     .onFirstCall().callsArgWithAsync(1, null, result())
     .onSecondCall().callsArgWithAsync(1, null, result());
 
-  const s3 = { send: noop };
+  const s3 = { uploadFile: noop };
   const mockS3 = Sinon.mock(s3);
 
-  mockS3.expects('send')
-    .exactly(4)  // Expecting 4 files to upload: index, sitemap 1 and sitemap 2
-    .returns(Promise.resolve());
+  const emitter = () => ({
+    on (name, fn) {
+      if (name === 'end') setTimeout(fn, 100);
+      return this;
+    }
+  });
+
+  mockS3.expects('uploadFile')
+    .exactly(4)  // Expecting 4 files ot upload: index, sitemap 1 and sitemap 2
+    .onFirstCall().returns(emitter())
+    .onSecondCall().returns(emitter())
+    .onThirdCall().returns(emitter())
+    .onCall(3).returns(emitter());
 
   const handler = createHandler(elastic, s3, testSettings);
 
