@@ -3,3 +3,4 @@ coverage
 settings.json
 dist
 tmp
+.DS_Store

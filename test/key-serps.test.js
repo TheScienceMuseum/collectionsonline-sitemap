@@ -23,9 +23,57 @@ test('Should get key serp pages', (t) => {
   const elastic = { search: noop };
   const mockElastic = Sinon.mock(elastic);
 
-  const catResult = () => ({body: {aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}}});
-  const locResult = () => ({body: {aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}}});
-  const locCatResult = () => ({body: {aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}}});
+  // get-categories.js: category.name.keyword aggregation
+  const catResult = () => ({
+    body: {
+      aggregations: {
+        category: { buckets: [{ key: 'Surgery', doc_count: 1 }] }
+      }
+    }
+  });
+
+  // get-locations.js: ondisplay.value.keyword aggregation
+  // includes a standalone museum and a combined 'Museum, Gallery' entry
+  const locResult = () => ({
+    body: {
+      aggregations: {
+        display_values: {
+          buckets: [
+            { key: 'Science Museum', doc_count: 12556 },
+            { key: 'Science Museum, Energy Hall', doc_count: 2335 },
+            { key: 'Energy Hall', doc_count: 2335 } // standalone gallery — should be skipped
+          ]
+        }
+      }
+    }
+  });
+
+  // get-categories-at-locations.js: ondisplay.value.keyword with categories sub-agg
+  const locCatResult = () => ({
+    body: {
+      aggregations: {
+        display_values: {
+          buckets: [
+            {
+              key: 'Science Museum',
+              doc_count: 12556,
+              categories: { buckets: [{ key: 'Robots', doc_count: 3 }] }
+            },
+            {
+              key: 'Science Museum, Energy Hall',
+              doc_count: 2335,
+              categories: { buckets: [{ key: 'Robots', doc_count: 2 }] }
+            },
+            {
+              key: 'Energy Hall', // standalone gallery — should be skipped
+              doc_count: 2335,
+              categories: { buckets: [{ key: 'Robots', doc_count: 2 }] }
+            }
+          ]
+        }
+      }
+    }
+  });
 
   mockElastic.expects('search')
     .exactly(1)
@@ -36,16 +84,21 @@ test('Should get key serp pages', (t) => {
     .callsArgWithAsync(1, null, locResult());
 
   mockElastic.expects('search')
-    .exactly(4)
+    .exactly(1)
     .callsArgWithAsync(1, null, locCatResult());
 
   addKeySerps(elastic, testSettings, [], (err, data) => {
     t.ifError(err, 'Results added successfully');
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.ok(data.every(el => el.loc === el.loc.toLowerCase()), 'URLs are all lowercase');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/surgery'), 'URLs are created correctly');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum/categories/robots'), 'URLs are created correctly');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum'), 'URLs are created correctly');
+
+    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/surgery'), 'Category URL is correct');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum'), 'Museum URL is correct');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/science-museum/gallery/energy-hall'), 'Museum+gallery URL is correct');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/science-museum'), 'Category+museum URL is correct');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/science-museum/gallery/energy-hall'), 'Category+museum+gallery URL is correct');
+    t.notOk(data.find(el => el.loc === 'http://localhost/search/museum/energy-hall'), 'Standalone gallery is not a top-level museum URL');
+
     t.end();
   });
 });

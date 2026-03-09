@@ -9,6 +9,9 @@
     "clean": "rm -rf dist/*",
     "test": "semistandard && istanbul cover tape 'test/*.test.js'"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Science Museum Group",
   "license": "MIT",
   "dependencies": {

@@ -31,8 +31,8 @@ test('Should generate and upload sitemap.xml', (t) => {
 
   const result = () => ({body: {hits: {total: {value: 3}, hits: [fakeHit()]}}});
   const catResult = () => ({body: {aggregations: {category: {buckets: [{key: 'Surgery', doc_count: 1}]}}}});
-  const locResult = () => ({body: {aggregations: {location: {buckets: [{key: 'Science Museum', doc_count: 5}]}}}});
-  const locCatResult = () => ({body: {aggregations: {category: {category: {buckets: [{key: 'Robots', doc_count: 3}]}}}}});
+  const locResult = () => ({body: {aggregations: {display_values: {buckets: [{key: 'Science Museum', doc_count: 5}, {key: 'Science Museum, Energy Hall', doc_count: 2}]}}}});
+  const locCatResult = () => ({body: {aggregations: {display_values: {buckets: [{key: 'Science Museum', doc_count: 5, categories: {buckets: [{key: 'Robots', doc_count: 3}]}}, {key: 'Science Museum, Energy Hall', doc_count: 2, categories: {buckets: [{key: 'Robots', doc_count: 2}]}}]}}}});
 
   // First result on initial call
   mockElastic.expects('search')
@@ -44,7 +44,7 @@ test('Should generate and upload sitemap.xml', (t) => {
     .callsArgWithAsync(1, null, locResult());
 
   mockElastic.expects('search')
-    .exactly(4)
+    .exactly(1)
     .callsArgWithAsync(1, null, locCatResult());
 
   mockElastic.expects('search')
