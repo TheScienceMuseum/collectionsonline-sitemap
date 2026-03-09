@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap.svg)](https://travis-ci.org/TheScienceMuseum/collectionsonline-sitemap) [![dependencies Status](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap/status.svg)](https://david-dm.org/TheScienceMuseum/collectionsonline-sitemap) [![Coverage Status](https://img.shields.io/codecov/c/github/TheScienceMuseum/collectionsonline-sitemap.svg?maxAge=2592000)](https://codecov.io/gh/TheScienceMuseum/collectionsonline-sitemap)
+
 # collectionsonline-sitemap
 
 An AWS lambda for generating a sitemap.xml and storing it to S3.
