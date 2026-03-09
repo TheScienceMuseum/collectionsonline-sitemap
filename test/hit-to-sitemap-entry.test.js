@@ -187,6 +187,54 @@ test('Should not apply minLastmod floor when record is newer', (t) => {
   });
 });
 
+test('Should not apply minLastmod floor when type is excluded', (t) => {
+  t.plan(2);
+
+  const oldProcessed = new Date('2020-01-01').getTime();
+  const minLastmod = '2024-06-01T00:00:00.000Z';
+
+  const hit = {
+    _id: 'smg-archive-99',
+    _source: {
+      '@admin': {uid: 'co-archive-99', processed: oldProcessed},
+      '@datatype': {base: 'archive'},
+      summary: {title: 'Old Document'}
+    }
+  };
+
+  const settings = Object.assign({}, testSettings, {minLastmod, minLastmodExclude: ['documents']});
+
+  hitToSitemapEntry(hit, null, settings, (err, entry) => {
+    t.ifError(err, 'No error');
+    t.equal(entry.lastmod, new Date(oldProcessed).toISOString(), 'lastmod is not floored for excluded type');
+    t.end();
+  });
+});
+
+test('Should still apply minLastmod floor to non-excluded types when exclude list is set', (t) => {
+  t.plan(2);
+
+  const oldProcessed = new Date('2020-01-01').getTime();
+  const minLastmod = '2024-06-01T00:00:00.000Z';
+
+  const hit = {
+    _id: 'smg-object-99',
+    _source: {
+      '@admin': {uid: 'co-object-99', processed: oldProcessed},
+      '@datatype': {base: 'object'},
+      summary: {title: 'Old Object'}
+    }
+  };
+
+  const settings = Object.assign({}, testSettings, {minLastmod, minLastmodExclude: ['documents']});
+
+  hitToSitemapEntry(hit, null, settings, (err, entry) => {
+    t.ifError(err, 'No error');
+    t.equal(entry.lastmod, minLastmod, 'lastmod is still floored for non-excluded type');
+    t.end();
+  });
+});
+
 test('Should not include image:image key when no images', (t) => {
   t.plan(2);
 

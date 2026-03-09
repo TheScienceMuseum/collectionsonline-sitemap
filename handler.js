@@ -15,6 +15,15 @@ module.exports = (elastic, s3, settings) => {
     settings = Object.assign({}, settings, { minLastmod: process.env.SITEMAP_MIN_LASTMOD });
   }
 
+  // SITEMAP_MIN_LASTMOD_EXCLUDE — comma-separated list of types to exempt from
+  // the minLastmod floor (e.g. "documents"). Useful when some record types are
+  // expensive to reprocess and can be deferred to a later recrawl.
+  if (process.env.SITEMAP_MIN_LASTMOD_EXCLUDE) {
+    settings = Object.assign({}, settings, {
+      minLastmodExclude: process.env.SITEMAP_MIN_LASTMOD_EXCLUDE.split(',').map(function (t) { return t.trim(); })
+    });
+  }
+
   const sitemapDir = Path.join(settings.tmpDir || 'tmp', 'sitemap' + Date.now().toString());
 
   return (event, context, cb) => {
