@@ -31,6 +31,22 @@ Connection details for the elasticsearch index to use.
 ### `s3`
 AWS S3 bucket name and access credentials for where to put the sitemap files. These credentials should have permissions to write to and set permissions on the bucket.
 
+## Environment variables
+
+### `SITEMAP_MIN_LASTMOD`
+
+Set this on the Lambda to force Google to recrawl all pages after a design change (e.g. a new page layout or component).
+
+When set, any record whose `processed` date is older than the value will have its `lastmod` floored to this date, making Google treat the page as recently updated. Records that are already newer than this date are unaffected.
+
+**Format:** ISO 8601 date string, e.g. `2024-06-01T00:00:00.000Z`
+
+**Usage:**
+1. Set `SITEMAP_MIN_LASTMOD` on the Lambda environment to the date of your design change
+2. Run the sitemap generator — all pages will appear updated to Google
+3. Wait for Google to recrawl (check Search Console)
+4. Remove the environment variable once recrawling is complete
+
 ## Deploy
 
 1. Install just the dependencies needed for running the lambda
