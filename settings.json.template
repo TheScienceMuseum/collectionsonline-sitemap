@@ -1,5 +1,6 @@
 {
   "siteUrl": "http://localhost:8000",
+  "imageSiteUrl": "https://coimages.sciencemuseumgroup.org.uk",
   "sitemapUrl": "http://localhost:8000",
   "maxSitemapUrls": 50000,
   "pageSize": 10000,
