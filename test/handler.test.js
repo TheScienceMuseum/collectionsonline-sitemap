@@ -5,7 +5,7 @@ const fakeHit = require('./helpers/fake-hit');
 const noop = () => null;
 
 test('Should generate and upload sitemap.xml', (t) => {
-  t.plan(4);
+  t.plan(5);
 
   // Elastic index will have 3 documents in it
   // Page size is 1
@@ -35,28 +35,14 @@ test('Should generate and upload sitemap.xml', (t) => {
   const locCatResult = () => ({body: {aggregations: {display_values: {buckets: [{key: 'Science Museum', doc_count: 5, categories: {buckets: [{key: 'Robots', doc_count: 3}]}}, {key: 'Science Museum, Energy Hall', doc_count: 2, categories: {buckets: [{key: 'Robots', doc_count: 2}]}}]}}}});
   const colResult = () => ({body: {aggregations: {collection: {buckets: [{key: 'Flight Collection', doc_count: 42}]}}}});
 
-  // First result on initial call
-  mockElastic.expects('search')
-    .exactly(1)
-    .callsArgWithAsync(1, null, catResult());
+  // Key SERP searches: categories, locations, categoriesAtLocations, collections
+  mockElastic.expects('search').exactly(1).callsArgWithAsync(1, null, catResult());
+  mockElastic.expects('search').exactly(1).callsArgWithAsync(1, null, locResult());
+  mockElastic.expects('search').exactly(1).callsArgWithAsync(1, null, locCatResult());
+  mockElastic.expects('search').exactly(1).callsArgWithAsync(1, null, colResult());
 
-  mockElastic.expects('search')
-    .exactly(1)
-    .callsArgWithAsync(1, null, locResult());
-
-  mockElastic.expects('search')
-    .exactly(1)
-    .callsArgWithAsync(1, null, locCatResult());
-
-  mockElastic.expects('search')
-    .exactly(1)
-    .callsArgWithAsync(1, null, colResult());
-
-  mockElastic.expects('search')
-    .exactly(1)
-    .callsArgWithAsync(1, null, result());
-
-  // Second and third result on second and third call
+  // Record scroll: initial search + 2 scroll pages
+  mockElastic.expects('search').exactly(1).callsArgWithAsync(1, null, result());
   mockElastic.expects('scroll')
     .exactly(2)
     .onFirstCall().callsArgWithAsync(1, null, result())
@@ -65,18 +51,20 @@ test('Should generate and upload sitemap.xml', (t) => {
   const s3 = { send: noop };
   const mockS3 = Sinon.mock(s3);
 
+  // Files: category-sitemap.xml, museum-sitemap.xml, collection-sitemap.xml,
+  //        sitemap-3.xml (records 1-2), sitemap-4.xml (record 3), sitemap.xml (index)
   mockS3.expects('send')
-    .exactly(4)  // Expecting 4 files to upload: index, sitemap 1 and sitemap 2
+    .exactly(6)
     .returns(Promise.resolve());
 
   const handler = createHandler(elastic, s3, testSettings);
 
-  // Method under test
   handler(Sinon.stub(), Sinon.stub(), (err, sitemapUrls) => {
     t.ifError(err, 'Handler completed successfully');
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.doesNotThrow(() => mockS3.verify(), 's3 mock verified');
-    t.equal(sitemapUrls.length, 4, 'Correct number of sitemaps created');
+    t.equal(sitemapUrls.length, 6, 'Correct number of sitemaps created');
+    t.ok(sitemapUrls.some(u => u.includes('category-sitemap')), 'category-sitemap.xml created');
     t.end();
   });
 });
