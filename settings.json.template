@@ -9,6 +9,7 @@
     "host": "",
     "log": "error"
   },
+  "standaloneMuseums": ["Locomotion"],
   "s3": {
     "region": "eu-west-1",
     "accessKeyId": "",
