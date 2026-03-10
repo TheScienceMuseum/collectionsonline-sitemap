@@ -6,7 +6,10 @@ const hitToSitemapEntry = require('./lib/hit-to-sitemap-entry');
 const createSitemap = require('./lib/create-sitemap');
 const createSitemapIndex = require('./lib/create-sitemap-index');
 const uploadFiles = require('./lib/upload-files');
-const addKeySerps = require('./lib/add-key-serps');
+const getCategories = require('./lib/get-categories');
+const getLocations = require('./lib/get-locations');
+const getCategoriesAtLocations = require('./lib/get-categories-at-locations');
+const getCollections = require('./lib/get-collections');
 
 module.exports = (elastic, s3, settings) => {
   // SITEMAP_MIN_LASTMOD env var overrides settings — set in Lambda to force
@@ -32,44 +35,69 @@ module.exports = (elastic, s3, settings) => {
       // Create tmp dir for storing the created sitemaps
       (cb) => mkdirp(sitemapDir, (err) => cb(err)),
 
-      // Add key SERP pages to sitemap
+      // Categories → category-sitemap.xml
       (cb) => {
-        const sitemaps = [];
-
-        addKeySerps(elastic, settings, sitemaps, cb);
-      },
-
-      (sitemaps, cb) => {
-        const filename = `sitemap-${0}.xml`;
-        const filePath = Path.join(sitemapDir, filename);
-
-        createSitemap(sitemaps, filePath, (err) => {
+        getCategories(elastic, settings, [], (err, entries) => {
           if (err) return cb(err);
-          console.log(`${filename} created`);
-          cb(null, [filename]);
+          const filename = 'category-sitemap.xml';
+          const filePath = Path.join(sitemapDir, filename);
+          createSitemap(entries, filePath, (err) => {
+            if (err) return cb(err);
+            console.log(`${filename} created`);
+            cb(null, [filename]);
+          });
         });
       },
 
-      // Create each sitemap
+      // Museums + galleries + category-at-location pages → museum-sitemap.xml
+      (sitemaps, cb) => {
+        Async.waterfall([
+          (cb) => getLocations(elastic, settings, [], cb),
+          (entries, cb) => getCategoriesAtLocations(elastic, settings, entries, cb)
+        ], (err, entries) => {
+          if (err) return cb(err);
+          const filename = 'museum-sitemap.xml';
+          const filePath = Path.join(sitemapDir, filename);
+          createSitemap(entries, filePath, (err) => {
+            if (err) return cb(err);
+            console.log(`${filename} created`);
+            cb(null, sitemaps.concat([filename]));
+          });
+        });
+      },
+
+      // Named collections → collection-sitemap.xml
+      (sitemaps, cb) => {
+        getCollections(elastic, settings, [], (err, entries) => {
+          if (err) return cb(err);
+          const filename = 'collection-sitemap.xml';
+          const filePath = Path.join(sitemapDir, filename);
+          createSitemap(entries, filePath, (err) => {
+            if (err) return cb(err);
+            console.log(`${filename} created`);
+            cb(null, sitemaps.concat([filename]));
+          });
+        });
+      },
+
+      // Scroll all record types → sitemap-N.xml
       (sitemaps, cb) => {
         scrollIndex(elastic, {
           batchSize: settings.maxSitemapUrls,
           pageSize: settings.pageSize,
           fields: ['@admin.uid', '@admin.processed', '@datatype.base', 'summary.title', 'multimedia', 'child'],
 
-          // Transform a hit into a sitemap entry
           onHit: (hit, cb) => hitToSitemapEntry(hit, elastic, settings, cb),
 
-          // Transform a batch of sitemap entries into a sitemap.xml
-          onBatch: (entries, cb) => {
+          onBatch: (entries, batchCb) => {
             const filename = `sitemap-${sitemaps.length}.xml`;
             const filePath = Path.join(sitemapDir, filename);
 
             createSitemap(entries, filePath, (err) => {
-              if (err) return cb(err);
+              if (err) return batchCb(err);
               console.log(`${filename} created`);
               sitemaps.push(filename);
-              cb();
+              batchCb();
             });
           }
         }, (err) => cb(err, sitemaps));
