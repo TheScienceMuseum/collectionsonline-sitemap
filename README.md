@@ -28,8 +28,8 @@ Temporary directory where the sitemap files are stored. For running on AWS this 
 ### `elasticsearch`
 Connection details for the elasticsearch index to use.
 
-### `standaloneMuseums`
-An array of museum names that have no individual gallery pages in the index. These are included as top-level `/search/museum/<slug>` URLs even though they don't appear in any combined `"Museum, Gallery"` `ondisplay` entry. Museums that do have gallery pages are detected automatically and do not need to be listed here (though listing them is harmless).
+### `museums`
+The definitive allowlist of valid museum names. Only museums in this list get top-level `/search/museum/<slug>` URLs and gallery/category sub-URLs — all other `ondisplay.value.keyword` values (standalone galleries, non-museum locations, etc.) are ignored. Values must match the exact ES string, e.g. `"Science Museum"` produces `/search/museum/science-museum`.
 
 ### `s3`
 AWS S3 bucket name and access credentials for where to put the sitemap files. These credentials should have permissions to write to and set permissions on the bucket.

@@ -9,7 +9,7 @@ test('Should get key serp pages', (t) => {
     sitemapUrl: 'http://localhost',
     pageSize: 1,
     maxSitemapUrls: 2,
-    standaloneMuseums: ['Locomotion'],
+    museums: ['Science Museum', 'Locomotion'],
     elasticsearch: {
       apiVersion: 5.4,
       host: 'http://localhost'
@@ -45,7 +45,8 @@ test('Should get key serp pages', (t) => {
             { key: 'Science Museum', doc_count: 12556 },
             { key: 'Science Museum, Energy Hall', doc_count: 2335 },
             { key: 'Energy Hall', doc_count: 2335 }, // standalone gallery — should be skipped
-            { key: 'Locomotion, Main Hall', doc_count: 500 } // Locomotion only appears with a gallery
+            { key: 'Locomotion, Main Hall', doc_count: 500 }, // Locomotion appears as combined entry
+            { key: 'Science and Innovation Park, Welcome Building', doc_count: 4 } // not in museums allowlist — should be skipped
           ]
         }
       }
@@ -74,8 +75,13 @@ test('Should get key serp pages', (t) => {
               categories: { buckets: [{ key: 'Robots', doc_count: 2 }] }
             },
             {
-              key: 'Locomotion, Main Hall', // Locomotion only appears with a gallery
+              key: 'Locomotion, Main Hall', // Locomotion appears as combined entry
               doc_count: 500,
+              categories: { buckets: [{ key: 'Robots', doc_count: 1 }] }
+            },
+            {
+              key: 'Science and Innovation Park, Welcome Building', // not in museums allowlist
+              doc_count: 4,
               categories: { buckets: [{ key: 'Robots', doc_count: 1 }] }
             }
           ]
@@ -111,6 +117,7 @@ test('Should get key serp pages', (t) => {
     t.ok(data.find(el => el.loc === 'http://localhost/search/museum/locomotion/gallery/main-hall'), 'Locomotion gets a museum+gallery URL');
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion'), 'Locomotion gets a category+museum URL derived from its gallery entries');
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion/gallery/main-hall'), 'Locomotion gets a category+museum+gallery URL');
+    t.notOk(data.find(el => el.loc.includes('science-and-innovation-park')), 'Non-allowlisted location is excluded entirely');
 
     t.end();
   });

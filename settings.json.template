@@ -9,7 +9,7 @@
     "host": "",
     "log": "error"
   },
-  "standaloneMuseums": ["Science Museum", "Science and Industry Museum", "National Science and Media Museum", "National Railway Museum", "Locomotion"],
+  "museums": ["Science Museum", "Science and Industry Museum", "National Science and Media Museum", "National Railway Museum", "Locomotion"],
   "s3": {
     "region": "eu-west-1",
     "accessKeyId": "",
