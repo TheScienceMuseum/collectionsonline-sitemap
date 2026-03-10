@@ -34,9 +34,9 @@ test('Should get key serp pages', (t) => {
   });
 
   // get-locations.js: ondisplay.value.keyword aggregation
-  // includes a standalone museum, a combined 'Museum, Gallery' entry,
-  // a standalone gallery (should be skipped), and Locomotion (standalone museum
-  // with no gallery sub-entries, included via settings.standaloneMuseums)
+  // Locomotion only appears as a combined 'Locomotion, Main Hall' entry — there
+  // is no standalone 'Locomotion' bucket. The standaloneMuseums setting ensures
+  // a top-level museum URL is still generated.
   const locResult = () => ({
     body: {
       aggregations: {
@@ -45,7 +45,7 @@ test('Should get key serp pages', (t) => {
             { key: 'Science Museum', doc_count: 12556 },
             { key: 'Science Museum, Energy Hall', doc_count: 2335 },
             { key: 'Energy Hall', doc_count: 2335 }, // standalone gallery — should be skipped
-            { key: 'Locomotion', doc_count: 500 } // standalone museum via standaloneMuseums setting
+            { key: 'Locomotion, Main Hall', doc_count: 500 } // Locomotion only appears with a gallery
           ]
         }
       }
@@ -74,7 +74,7 @@ test('Should get key serp pages', (t) => {
               categories: { buckets: [{ key: 'Robots', doc_count: 2 }] }
             },
             {
-              key: 'Locomotion', // standalone museum via standaloneMuseums setting
+              key: 'Locomotion, Main Hall', // Locomotion only appears with a gallery
               doc_count: 500,
               categories: { buckets: [{ key: 'Robots', doc_count: 1 }] }
             }
@@ -107,8 +107,10 @@ test('Should get key serp pages', (t) => {
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/science-museum'), 'Category+museum URL is correct');
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/science-museum/gallery/energy-hall'), 'Category+museum+gallery URL is correct');
     t.notOk(data.find(el => el.loc === 'http://localhost/search/museum/energy-hall'), 'Standalone gallery is not a top-level museum URL');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/locomotion'), 'Standalone museum (Locomotion) gets a museum URL');
-    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion'), 'Standalone museum (Locomotion) gets a category+museum URL');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/locomotion'), 'Locomotion gets a top-level museum URL even with no standalone bucket');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/museum/locomotion/gallery/main-hall'), 'Locomotion gets a museum+gallery URL');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion'), 'Locomotion gets a category+museum URL derived from its gallery entries');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion/gallery/main-hall'), 'Locomotion gets a category+museum+gallery URL');
 
     t.end();
   });
