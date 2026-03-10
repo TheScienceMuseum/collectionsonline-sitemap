@@ -90,6 +90,15 @@ test('Should get key serp pages', (t) => {
     }
   });
 
+  // get-collections.js: cumulation.collector.summary.title.keyword aggregation
+  const colResult = () => ({
+    body: {
+      aggregations: {
+        collection: { buckets: [{ key: 'Flight Collection', doc_count: 42 }] }
+      }
+    }
+  });
+
   mockElastic.expects('search')
     .exactly(1)
     .callsArgWithAsync(1, null, catResult());
@@ -101,6 +110,10 @@ test('Should get key serp pages', (t) => {
   mockElastic.expects('search')
     .exactly(1)
     .callsArgWithAsync(1, null, locCatResult());
+
+  mockElastic.expects('search')
+    .exactly(1)
+    .callsArgWithAsync(1, null, colResult());
 
   addKeySerps(elastic, testSettings, [], (err, data) => {
     t.ifError(err, 'Results added successfully');
@@ -118,6 +131,7 @@ test('Should get key serp pages', (t) => {
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion'), 'Locomotion gets a category+museum URL derived from its gallery entries');
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion/gallery/main-hall'), 'Locomotion gets a category+museum+gallery URL');
     t.notOk(data.find(el => el.loc.includes('science-and-innovation-park')), 'Non-allowlisted location is excluded entirely');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/collection/flight-collection'), 'Collection URL is correct');
 
     t.end();
   });
