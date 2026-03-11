@@ -44,6 +44,7 @@ test('Should get key serp pages', (t) => {
           buckets: [
             { key: 'Science Museum', doc_count: 12556 },
             { key: 'Science Museum, Energy Hall', doc_count: 2335 },
+            { key: 'Science Museum, Clockmakers\' Museum Gallery', doc_count: 150 }, // apostrophe in gallery name
             { key: 'Energy Hall', doc_count: 2335 }, // standalone gallery — should be skipped
             { key: 'Locomotion, Main Hall', doc_count: 500 }, // Locomotion appears as combined entry
             { key: 'Science and Innovation Park, Welcome Building', doc_count: 4 } // not in museums allowlist — should be skipped
@@ -68,6 +69,11 @@ test('Should get key serp pages', (t) => {
               key: 'Science Museum, Energy Hall',
               doc_count: 2335,
               categories: { buckets: [{ key: 'Robots', doc_count: 2 }] }
+            },
+            {
+              key: 'Science Museum, Clockmakers\' Museum Gallery',
+              doc_count: 150,
+              categories: { buckets: [{ key: 'Horology', doc_count: 150 }] }
             },
             {
               key: 'Energy Hall', // standalone gallery — should be skipped
@@ -132,6 +138,8 @@ test('Should get key serp pages', (t) => {
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion/gallery/main-hall'), 'Locomotion gets a category+museum+gallery URL');
     t.notOk(data.find(el => el.loc.includes('science-and-innovation-park')), 'Non-allowlisted location is excluded entirely');
     t.ok(data.find(el => el.loc === 'http://localhost/search/collection/flight-collection'), 'Collection URL is correct');
+    t.ok(data.find(el => el.loc === "http://localhost/search/museum/science-museum/gallery/clockmakers'-museum-gallery"), "Apostrophe in gallery name is preserved in URL");
+    t.ok(data.find(el => el.loc === "http://localhost/search/categories/horology/museum/science-museum/gallery/clockmakers'-museum-gallery"), "Apostrophe preserved in category+museum+gallery URL");
 
     t.end();
   });
