@@ -100,7 +100,13 @@ test('Should get key serp pages', (t) => {
   const colResult = () => ({
     body: {
       aggregations: {
-        collection: { buckets: [{ key: 'Flight Collection', doc_count: 42 }] }
+        collection: {
+          buckets: [
+            { key: 'Flight Collection', doc_count: 42 },
+            { key: 'Burgoyne-Johnson Collection', doc_count: 7 },
+            { key: 'People, Pride and Progress', doc_count: 9 }
+          ]
+        }
       }
     }
   });
@@ -138,6 +144,8 @@ test('Should get key serp pages', (t) => {
     t.ok(data.find(el => el.loc === 'http://localhost/search/categories/robots/museum/locomotion/gallery/main-hall'), 'Locomotion gets a category+museum+gallery URL');
     t.notOk(data.find(el => el.loc.includes('science-and-innovation-park')), 'Non-allowlisted location is excluded entirely');
     t.ok(data.find(el => el.loc === 'http://localhost/search/collection/flight-collection'), 'Collection URL is correct');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/collection/burgoyne%252djohnson-collection'), 'Hyphen in collection name is encoded as %252D');
+    t.ok(data.find(el => el.loc === 'http://localhost/search/collection/people%252c-pride-and-progress'), 'Comma in collection name is encoded as %252C');
     t.ok(data.find(el => el.loc === "http://localhost/search/museum/science-museum/gallery/clockmakers'-museum-gallery"), "Apostrophe in gallery name is preserved in URL");
     t.ok(data.find(el => el.loc === "http://localhost/search/categories/horology/museum/science-museum/gallery/clockmakers'-museum-gallery"), "Apostrophe preserved in category+museum+gallery URL");
 
