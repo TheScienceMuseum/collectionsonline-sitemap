@@ -1,4 +1,3 @@
-require('./').handler(null, null, (err) => {
-  if (err) throw err;
+require('./').handler(null, null).then(() => {
   console.log('Done!');
 });

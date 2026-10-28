@@ -60,12 +60,33 @@ test('Should generate and upload sitemap.xml', (t) => {
 
   const handler = createHandler(elastic, s3, testSettings);
 
-  handler(Sinon.stub(), Sinon.stub(), (err, sitemapUrls) => {
-    t.ifError(err, 'Handler completed successfully');
+  handler(Sinon.stub(), Sinon.stub()).then((sitemapUrls) => {
+    t.pass('Handler completed successfully');
     t.doesNotThrow(() => mockElastic.verify(), 'Elasticsearch mock verified');
     t.doesNotThrow(() => mockS3.verify(), 's3 mock verified');
     t.equal(sitemapUrls.length, 6, 'Correct number of sitemaps created');
     t.ok(sitemapUrls.some(u => u.includes('category-sitemap')), 'category-sitemap.xml created');
     t.end();
-  });
+  }, (err) => t.end(err));
+});
+
+test('Should reject when sitemap generation fails', (t) => {
+  t.plan(1);
+
+  const testSettings = {
+    siteUrl: 'http://localhost',
+    sitemapUrl: 'http://localhost',
+    s3: { bucket: 'TEST' }
+  };
+
+  const elastic = { search: noop };
+  const mockElastic = Sinon.mock(elastic);
+  mockElastic.expects('search').once().callsArgWithAsync(1, new Error('Elasticsearch unavailable'));
+
+  const handler = createHandler(elastic, { send: noop }, testSettings);
+
+  handler(Sinon.stub(), Sinon.stub()).then(
+    () => t.fail('Handler should have rejected'),
+    (err) => t.equal(err.message, 'Elasticsearch unavailable', 'Handler rejects with the error')
+  );
 });
