@@ -4,7 +4,7 @@ An AWS lambda for generating a sitemap.xml and storing it to S3.
 
 ## Getting started
 
-1. Install [Node.js](https://nodejs.org/en/) 22.x LTS (use [nvm](https://github.com/nvm-sh/nvm): `nvm use`)
+1. Install [Node.js](https://nodejs.org/en/) 24.x LTS (use [nvm](https://github.com/nvm-sh/nvm): `nvm use`)
 2. Install dependencies: `npm install`
 3. Copy `settings.json.template` to `settings.json` in the project root
 
@@ -78,7 +78,7 @@ A comma-separated list of record types to exempt from the `SITEMAP_MIN_LASTMOD` 
     * Choose **lambda-canary** blueprint
     * Name **trigger** and set rate to "1 day"
     * Name function "sitemapGenerator"
-    * Runtime **Node.js 22.x**
+    * Runtime **Node.js 24.x**
     * Choose **Upload a .ZIP file**
     * Set **handler** to "index.handler"
     * Choose **Create new role from template(s)**

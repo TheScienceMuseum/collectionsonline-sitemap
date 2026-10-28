@@ -10,7 +10,7 @@
     "test": "semistandard && istanbul cover tape 'test/*.test.js'"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "author": "Science Museum Group",
   "license": "MIT",
