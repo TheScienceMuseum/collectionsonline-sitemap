@@ -29,7 +29,8 @@ module.exports = (elastic, s3, settings) => {
 
   const sitemapDir = Path.join(settings.tmpDir || 'tmp', 'sitemap' + Date.now().toString());
 
-  return (event, context, cb) => {
+  // Async handler — Lambda dropped callback-style handlers from Node.js 24
+  return async (event, context) => new Promise((resolve, reject) => {
     Async.waterfall([
 
       // Create tmp dir for storing the created sitemaps
@@ -121,10 +122,10 @@ module.exports = (elastic, s3, settings) => {
     ], (err, sitemaps) => {
       if (err) {
         console.error('Failed to create sitemap.xml', err);
-        return cb(err);
+        return reject(err);
       }
       console.log('sitemap.xml created');
-      cb(null, sitemaps.map((s) => `${settings.sitemapUrl}/${s}`));
+      resolve(sitemaps.map((s) => `${settings.sitemapUrl}/${s}`));
     });
-  };
+  });
 };
