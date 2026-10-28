@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - '22'
+  - '24'
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
